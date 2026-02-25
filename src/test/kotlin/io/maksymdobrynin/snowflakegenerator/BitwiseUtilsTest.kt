@@ -9,9 +9,11 @@ import org.junit.jupiter.params.provider.CsvSource
 
 class BitwiseUtilsTest {
 	@Nested
-	inner class Value5Bits {
-		private val length5Bits: Long = 5L
-		private val value5Bits: Long = 0b11111
+	class Value5Bits {
+		companion object {
+			const val LENGTH_5_BITS: Long = 5L
+			const val VALUE_5_BITS: Long = 0b11111
+		}
 
 		@ParameterizedTest
 		@CsvSource(
@@ -26,12 +28,13 @@ class BitwiseUtilsTest {
 			bitCount: Int,
 			expectedResult: Long,
 		) {
-			val actualResult = BitwiseUtils.extract(
-				src = value5Bits,
-				len = length5Bits,
-				startBit = startBit,
-				bitCount = bitCount,
-			)
+			val actualResult =
+				BitwiseUtils.extract(
+					src = VALUE_5_BITS,
+					len = LENGTH_5_BITS,
+					startBit = startBit,
+					bitCount = bitCount,
+				)
 			assertThat(actualResult).isEqualTo(expectedResult)
 		}
 
@@ -39,15 +42,15 @@ class BitwiseUtilsTest {
 		fun `should throw exception when startBit is out of range`() {
 			assertThatCode {
 				BitwiseUtils.extract(
-					src = value5Bits,
-					len = length5Bits,
+					src = VALUE_5_BITS,
+					len = LENGTH_5_BITS,
 					startBit = 6,
 					bitCount = 3,
 				)
 			}
 				.isExactlyInstanceOf(IllegalArgumentException::class.java)
 				.hasMessage(
-					"Starting bit must match range 0..${length5Bits - 1}, " +
+					"Starting bit must match range 0..${LENGTH_5_BITS - 1}, " +
 						"otherwise it will be out of bounds.",
 				)
 		}
@@ -56,8 +59,8 @@ class BitwiseUtilsTest {
 		fun `should throw exception when bitCount is out of range`() {
 			assertThatCode {
 				BitwiseUtils.extract(
-					src = value5Bits,
-					len = length5Bits,
+					src = VALUE_5_BITS,
+					len = LENGTH_5_BITS,
 					startBit = 0,
 					bitCount = 6,
 				)
@@ -65,7 +68,7 @@ class BitwiseUtilsTest {
 				.isExactlyInstanceOf(IllegalArgumentException::class.java)
 				.hasMessage(
 					"Count of bits to be extracted " +
-						"must match range of a given number that is 1..$length5Bits.",
+						"must match range of a given number that is 1..$LENGTH_5_BITS.",
 				)
 		}
 
@@ -73,8 +76,8 @@ class BitwiseUtilsTest {
 		fun `should throw exception when startBit + bitCount exceeds length`() {
 			assertThatCode {
 				BitwiseUtils.extract(
-					src = value5Bits,
-					len = length5Bits,
+					src = VALUE_5_BITS,
+					len = LENGTH_5_BITS,
 					startBit = 3,
 					bitCount = 3,
 				)
@@ -82,7 +85,7 @@ class BitwiseUtilsTest {
 				.isExactlyInstanceOf(IllegalArgumentException::class.java)
 				.hasMessage(
 					"Starting bit in combination with count of bits to be extracted [6] " +
-						"must not exceed the length of a given number: $length5Bits.",
+						"must not exceed the length of a given number: $LENGTH_5_BITS.",
 				)
 		}
 	}
