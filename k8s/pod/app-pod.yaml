@@ -9,6 +9,23 @@ spec:
     - name: snowflake-app
       image: snowflake-app
       imagePullPolicy: IfNotPresent
+      livenessProbe:
+        httpGet:
+          path: /management/health/livenessState
+          port: 8080
+        initialDelaySeconds: 15
+        periodSeconds: 10
+        timeoutSeconds: 2
+        failureThreshold: 3
+      readinessProbe:
+        httpGet:
+          path: /management/health/readinessState
+          port: 8080
+        initialDelaySeconds: 5
+        timeoutSeconds: 1
+        periodSeconds: 5
+        failureThreshold: 3
+        successThreshold: 1
       ports:
         - name: http
           containerPort: 8080
