@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: snowflake-service
+  labels:
+    app: snowflake-app
+    environment: development
+spec:
+  selector: # ищем поды с такими labels
+    app: snowflake-app
+    environment: development
+  ports:
+    - name: http
+      protocol: TCP
+      port: 8080 # на котором слушает Service (внутри кластера, например коммуникация микросервисов)
+      targetPort: 8080 # на котором слушает ПОД (контейнер)
+      nodePort: 30080 # который открывается НА НОДЕ, range 30000-32767 (nodePort -> port -> targetPort)
+  type: NodePort # какой тип сервиса (NodePort — открывает порт на каждой ноде)
+

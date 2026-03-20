@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: snowflake-app
+  namespace: default # можно не указывать (будет default)
+  labels:
+    app: snowflake-app
+spec: # описание как именно работает
+  replicas: 2 # количество под приложения
+  strategy: # стратегия обновления, т.е. как именно обновляем поды при выходе нового образа
+    type: RollingUpdate # плавное обновление. Есть еще через удаление старых под сначала, а потом создание новых
+    rollingUpdate:
+      maxUnavailable: 1 # сколько подов может быть недоступно во время обновления
+  selector: # какими подами управляет Deployment
+    matchLabels:
+      app: snowflake-app
+  template:
+    metadata:
+      name: snowflake-app
+      labels:
+        app: snowflake-app
+        environment: development
+    spec:
+      containers:
+        - name: snowflake-app
+          image: snowflake-app:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          resources: # какие ресурсы выделяем для контейнера
+            requests: # min гарантии
+              memory: "256Mi"
+              cpu: "250m"
+            limits: # max гарантии
+              memory: "512Mi"
+              cpu: "500m"
+          livenessProbe: # проверка на жив ли под и нужен ли его перезапуск
+            httpGet:
+              path: /management/health/livenessState
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+            successThreshold: 1
+          readinessProbe: # проверка готовности. Если не готов, то Service не направляет трафик
+            httpGet:
+              path: /management/health/readinessState
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 5
+
+
+
+
+
